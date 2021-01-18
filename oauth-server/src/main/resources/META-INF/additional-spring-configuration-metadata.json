@@ -1,0 +1,8 @@
+{
+  "properties": [
+    {
+      "name": "app.CLIENT_SECRET",
+      "type": "java.lang.String",
+      "description": "Description for app.CLIENT_SECRET."
+  }
+] }
