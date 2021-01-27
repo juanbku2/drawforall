@@ -1,4 +1,4 @@
-package com.drawsforall.usermanagement.configsecurity;
+package com.drawsforall.oauthserver.config;
 
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -12,7 +12,8 @@ import java.util.Collections;
 
 @Configuration
 public class CorsConfig {
-
+    //IMPORTANT: it has to be a normal configuration class,
+//not extending WebMvcConfigurerAdapter or other Spring Security class
 
     @Bean
     public FilterRegistrationBean<CorsFilter> customCorsFilter() {
@@ -28,6 +29,4 @@ public class CorsConfig {
         bean.setOrder(Ordered.HIGHEST_PRECEDENCE);
         return bean;
     }
-
-
 }

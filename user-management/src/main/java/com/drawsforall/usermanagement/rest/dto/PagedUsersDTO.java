@@ -31,5 +31,11 @@ public class PagedUsersDTO extends RepresentationModel<PagedUsersDTO> {
 
     private final int totalPages;
 
+    private final String sort;
+
+    private final String by;
+
+    private final String value;
+
 
 }

@@ -22,11 +22,10 @@ public class User {
     private String password;
     private String firstName;
     private String lastName;
-    private Integer enabled;
     private byte[] picByte;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "authorities",
+    @JoinTable(name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles;
 

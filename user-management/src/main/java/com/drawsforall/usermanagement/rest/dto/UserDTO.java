@@ -19,7 +19,6 @@ public class UserDTO extends RepresentationModel<UserDTO> {
     private String password;
     private String firstName;
     private String lastName;
-    private Integer enabled;
     private byte[] picByte;
     private List<String> roles;
 

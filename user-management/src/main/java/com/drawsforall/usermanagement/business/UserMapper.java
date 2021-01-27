@@ -41,9 +41,8 @@ public interface UserMapper {
                 .lastName(user.getLastName())
                 .picByte(decompressBytes(user.getPicByte()))
                 .roles(user.getRoles().stream()
-                        .map(role -> role.getAuthority().toString())
+                        .map(role -> role.getName().toString())
                         .collect(Collectors.toList()))
-                .enabled(user.getEnabled())
                 .build();
 
         userDTO.add(buildLinksToUserDTO(user));
@@ -63,7 +62,7 @@ public interface UserMapper {
     })
     User fromUserDTO(UserDTO userDTO);
 
-    default PagedUsersDTO toPagedUsersDTO(Page<User> pagedUsers) {
+    default PagedUsersDTO toPagedUsersDTO(Page<User> pagedUsers, String by, String value) {
         Page<UserDTO> page = pagedUsers.map(this::toUserDTO);
         PagedUsersDTO pagedUsersDTO = PagedUsersDTO.builder()
                 .elements(page.getContent())
@@ -74,32 +73,41 @@ public interface UserMapper {
                 .size(page.getSize())
                 .totalElements(page.getTotalElements())
                 .totalPages(page.getTotalPages())
+                .sort(page.getSort().toString())
+                .by(by)
+                .value(value)
                 .build();
 
-        pagedUsersDTO.add(buildLinksToPagedUsersDTO(pagedUsers.getNumber(), pagedUsers.getSize(), pagedUsers.hasNext(), pagedUsers.hasPrevious()));
+        pagedUsersDTO.add(buildLinksToPagedUsersDTO(pagedUsers.getNumber(), pagedUsers.getSize(),
+                pagedUsers.hasNext(), pagedUsers.hasPrevious(), pagedUsers.getSort().toString(), by, value));
         return pagedUsersDTO;
     }
 
 
     default List<Link> buildLinksToUserDTO(User user) {
-        Link all = linkTo(methodOn(UserController.class).getUsers(null, null)).withRel("All");
+        Link all = linkTo(methodOn(UserController.class).getUsers(null, null, null, null, null)).withRel("All");
         Link self = linkTo(methodOn(UserController.class).lookupUser(user.getId())).withRel("Self");
         return Arrays.asList(all, self);
     }
 
-    default List<Link> buildLinksToPagedUsersDTO(int pageNo, int pageSize, boolean hasNext, boolean hasPrevious) {
+    default List<Link> buildLinksToPagedUsersDTO(int pageNo, int pageSize, boolean hasNext, boolean hasPrevious, String sort,String by, String value) {
         List<Link> links = new ArrayList<>();
+        String fixedLink = sort.replaceAll(": DESC",",descending");
 
-        Link selfRel = linkTo(methodOn(UserController.class).getUsers(pageNo, pageSize)).withSelfRel();
+        if(sort.contains(": ASC")){
+            fixedLink = sort.replaceAll(": ASC",",ascending");
+        }
+
+        Link selfRel = linkTo(methodOn(UserController.class).getUsers(pageNo, pageSize, fixedLink, by, value)).withSelfRel();
         links.add(selfRel);
 
         if (hasNext) {
-            Link nextPage = linkTo(methodOn(UserController.class).getUsers(pageNo + 1, pageSize)).withRel("nextPage");
+            Link nextPage = linkTo(methodOn(UserController.class).getUsers(pageNo + 1, pageSize, fixedLink, by, value)).withRel("nextPage");
             links.add(nextPage);
         }
 
         if (hasPrevious) {
-            Link previousPage = linkTo(methodOn(UserController.class).getUsers(pageNo - 1, pageSize)).withRel("previousPage");
+            Link previousPage = linkTo(methodOn(UserController.class).getUsers(pageNo - 1, pageSize, fixedLink, by, value)).withRel("previousPage");
             links.add(previousPage);
         }
 
